@@ -1,6 +1,6 @@
 from users.models import User, Profile, OneTimeCode
 from rest_framework import serializers
-
+from botapp.models import BotUser
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -48,3 +48,15 @@ class OneTimeCodeLoginSerializer(serializers.Serializer):
         
         user = one_time_code.user
         return user
+    
+
+class BotUserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = BotUser
+        fields = ['id', 'user_id', 'phone_number','first_name', 'last_name', 'username', 'language_code', 'is_active', 'created_at', 'updated_at']
+    
+    def create(self, validated_data):
+        if BotUser.objects.filter(user_id=validated_data.get('user_id')).exists():
+            raise serializers.ValidationError({'user_id': 'This user already exists.'})
+        return super().create(validated_data)
