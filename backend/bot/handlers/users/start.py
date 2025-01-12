@@ -5,8 +5,9 @@ from bot.loader import dp
 
 @dp.message_handler(CommandStart())
 async def bot_start(message: types.Message):
-    # salomlashish xabari
-    await message.answer(f"Salom, {message.from_user.id}!")
+    await message.answer("Assalomu alaykum!\n"\
+                         "HangulHub platformasining rasmiy botiga xush kelibsiz!\n\n" \
+                         "⬇️Kontaktingizni yuboring va tizimga kirish uchun bir martalik parolingizni oling(tugmani bosing)" )
 
 
 
