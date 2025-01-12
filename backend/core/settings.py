@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'api',
     'main',
     'users',
+    'botapp',
 ]
 
 MIDDLEWARE = [
