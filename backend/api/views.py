@@ -1,4 +1,4 @@
-from .serializers import UserSerializer, OneTimeCodeLoginSerializer, BotUserSerializer
+from .serializers import UserSerializer, OneTimeCodeLoginSerializer, BotUserSerializer, OneTimeCodeGetSerializer
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status
@@ -63,6 +63,22 @@ class UserViewSet(viewsets.ViewSet):
         return Response({'message': 'Logout successful.'})
     
 
+class OneTimeCodeViewSet(viewsets.ViewSet):
+    @action(detail=False, methods=['post'], url_path='get', url_name='get')
+    def get(self, request):
+        serializer = OneTimeCodeGetSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        one_time_code = serializer.save()
+        return Response({
+            'id': one_time_code.id,
+            'user': one_time_code.user.id,
+            'code': one_time_code.code,
+            'created_at': one_time_code.created_at,
+            'updated_at': one_time_code.updated_at,
+            'is_used': one_time_code.is_used,
+        }, status=status.HTTP_201_CREATED)
+
+
 class BotUserViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['post'], url_path='exists', url_name='exists')
     def exists(self, request):
@@ -90,6 +106,19 @@ class BotUserViewSet(viewsets.ViewSet):
             'created_at': bot_user.created_at,
             'updated_at': bot_user.updated_at,
         }, status=status.HTTP_201_CREATED)
+    
+    
+    @action(detail=False, methods=['post'], url_path='me', url_name='me')
+    def me(self, request):
+        user_id = request.data.get('user_id')
+        if not user_id:
+            return Response({'user_id': 'This field is required.'}, status=status.HTTP_400_BAD_REQUEST)
+        bot_user = BotUser.objects.filter(user_id=user_id).first()
+        if not bot_user:
+            return Response({'user_id': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = BotUserSerializer(bot_user)
+        return Response(serializer.data)
+
 
     @action(detail=False, methods=['post'], url_path='refresh', url_name='refresh')
     def refresh(self, request):

@@ -69,3 +69,30 @@ def create_user(**data):
     }
     """
     return post('botusers/register/', data=data)
+
+
+def user_exists(user_id):
+    """
+    Check if the user exists
+    :param user_id: int
+    :return: Response
+    """
+    return post('botusers/exists/', data={'user_id': user_id})
+
+
+def get_user(user_id):
+    """
+    Get user by user_id
+    :param user_id: int
+    :return: Response
+    """
+    return post(f'botusers/me/', data={'user_id': user_id})
+
+
+def get_one_time_code(phone_number):
+    """
+    Get one-time code
+    :param phone_number: str
+    :return: Response
+    """
+    return post('otp/get/', data={'phone_number': phone_number})

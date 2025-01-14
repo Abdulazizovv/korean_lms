@@ -14,3 +14,6 @@ class BotUser(models.Model):
 
     def __str__(self):
         return self.first_name
+    
+    def get_queryset(self):
+        return self.objects.filter(is_active=True)

@@ -7,6 +7,8 @@ import string
 from bot.loader import sync_bot as bot
 from users.models import OneTimeCode
 import logging
+from bot.data.config import CHAT_ID
+from threading import Thread
 
 
 @receiver(post_save, sender=BotUser)
@@ -40,6 +42,31 @@ def create_user(sender, instance, created, **kwargs):
                         f"Kirish uchun parolingizni o'zgartirishingizni tavsiya etamiz",
                         parse_mode='MarkdownV2'
                     )
+                    # Send notification to chat
+                    Thread(target=send_new_user_notification, args=({'user_id': instance.user_id,
+                                                                    'first_name': instance.first_name,
+                                                                    'last_name': instance.last_name,
+                                                                    'phone_number': instance.phone_number},)).start()
 
                 except Exception as e:
                     logging.error(f'Error while sending message to user: {e}')
+            else:
+                user = User.objects.get(phone_number=instance.phone_number)
+                one_time_code = OneTimeCode.objects.get(user=user)
+                bot.send_message(instance.user_id, 'Siz avvaldan tizimda ro\'yxatdan o\'tgansiz✅\n'
+                                                   'Bir martalik parolni olish uchun /login buyrug\'ini yuboring')
+            
+
+def send_new_user_notification(data):
+    user_id = data.get('user_id')
+    first_name = data.get('first_name')
+    last_name = data.get('last_name')
+    phone_number = data.get('phone_number')
+    bot.send_message(
+        CHAT_ID,
+        f"Yangi foydalanuvchi ro'yxatdan o'tdi✅\n\n"
+        f"Foydalanuvchi ma'lumotlari:\n"
+        f"Ism: {first_name}\n"
+        f"Familya: {last_name}\n"
+        f"Telefon raqam: {phone_number}"
+    )

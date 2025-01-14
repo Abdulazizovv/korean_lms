@@ -15,6 +15,7 @@ async def get_contact(message: types.Message):
     first_name = message.from_user.first_name
     last_name = message.from_user.last_name
     username = message.from_user.username
+    await message.answer('⏳')
     try:
         response = create_user(
             user_id=user_id,
@@ -24,6 +25,5 @@ async def get_contact(message: types.Message):
             username=username
         )
     except Exception as e:
-        print(e)
         return await message.answer('Siz allaqachon ro\'yxatdan o\'tgansiz\n'
                                     'Bir martalik parolni olish uchun /login buyrug\'ini bosing')
