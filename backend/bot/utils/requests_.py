@@ -49,3 +49,23 @@ def delete(url, headers=None):
     except Timeout as e:
         raise RequestException('Timeout error') from e
     return response
+
+
+def create_user(**data):
+    """
+    Register a new bot user
+    :param data: dict
+    :return: Response
+
+    Example:
+    data = {
+        'user_id': 123456789,
+        'phone_number': '998901234567',
+        'first_name': 'John',
+        'last_name': 'Doe', | optional
+        'username': 'johndoe', | optional
+        'language_code': 'en', | optional | default: 'uz'
+        'is_active': True | optional | default: True
+    }
+    """
+    return post('botusers/register/', data=data)

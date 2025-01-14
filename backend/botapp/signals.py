@@ -22,13 +22,24 @@ def create_user(sender, instance, created, **kwargs):
                                     last_name=instance.last_name,
                                     password=random_password
                                     )
-                one_time_code = OneTimeCode.objects.get(user=user)
                 try:
-                    bot.send_message(instance.user_id, f'Sizning hisobingiz muvaffaqiyatli yaratildi✅\n\n'
-                                                    f'Sizning bir martalik parolingiz: {one_time_code}\n\n'
-                                                    f'Sizning hisob ma\'lumotlaringiz:\n'
-                                                    f'Login: {instance.phone_number}\n'
-                                                    f'Parol: {random_password}\n'
-                                                    f'Kirish uchun parolingizni o\'zgartirishingizni tavsiya etamiz.')
+                    one_time_code = OneTimeCode.objects.get(user=user)
+                    import re
+
+                    escaped_password = re.escape(random_password)
+                    escaped_code = re.escape(one_time_code.code)
+                    escaped_phone_number = re.escape(instance.phone_number)
+
+                    bot.send_message(
+                        instance.user_id,
+                        f"Sizning hisobingiz muvaffaqiyatli yaratildi✅\n\n"
+                        f"Sizning bir martalik parolingiz: `{escaped_code}`\n\n"
+                        f"Sizning hisob ma'lumotlaringiz:\n"
+                        f"Login: `{escaped_phone_number}`\n"
+                        f"Parol: ||{escaped_password}||\n\n"
+                        f"Kirish uchun parolingizni o'zgartirishingizni tavsiya etamiz",
+                        parse_mode='MarkdownV2'
+                    )
+
                 except Exception as e:
-                    logging.error(f'Error while sending message to user: {instance}')
+                    logging.error(f'Error while sending message to user: {e}')

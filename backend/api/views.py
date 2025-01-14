@@ -10,6 +10,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
+from botapp.models import BotUser
 
 
 
@@ -63,6 +64,16 @@ class UserViewSet(viewsets.ViewSet):
     
 
 class BotUserViewSet(viewsets.ViewSet):
+    @action(detail=False, methods=['post'], url_path='exists', url_name='exists')
+    def exists(self, request):
+        user_id = request.data.get('user_id')
+        if not user_id:
+            return Response({'user_id': 'This field is required.'}, status=status.HTTP_400_BAD_REQUEST)
+        if BotUser.objects.filter(user_id=user_id).exists():
+            return Response({'exists': True})
+        return Response({'exists': False})
+
+
     @action(detail=False, methods=['post'], url_path='register', url_name='register')
     def register(self, request):
         serializer = BotUserSerializer(data=request.data)
