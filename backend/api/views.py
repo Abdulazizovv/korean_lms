@@ -14,7 +14,13 @@ from botapp.models import BotUser
 
 
 
-class UserViewSet(viewsets.ViewSet):
+class UserViewSet(viewsets.ViewSet):    
+    @action(detail=False, methods=['get'], url_path='me', url_name='me', permission_classes=[IsAuthenticated])
+    def me(self, request):
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data)
+
+
     @action(detail=False, methods=['post'], url_path='login', url_name='login')
     def login(self, request):
         serializer = OneTimeCodeLoginSerializer(data=request.data)
